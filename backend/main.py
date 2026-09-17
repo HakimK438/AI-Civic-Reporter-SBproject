@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from sqlalchemy import text
-
+from fastapi.middleware.cors import CORSMiddleware
 from .database import Base, engine
 from . import models
 from .routes import router as auth_router,issue_router
@@ -9,6 +9,14 @@ app = FastAPI(
     title="AI Civic Reporter",
     description="AI-powered platform for reporting and managing civic issues",
     version="0.1.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 @app.on_event("startup")

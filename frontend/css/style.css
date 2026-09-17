@@ -1,0 +1,194 @@
+/* =========================
+   Login Page
+========================= */
+
+.login-container {
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 20px;
+}
+
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+
+    padding: 35px;
+
+    background: white;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+
+.login-header {
+    text-align: center;
+
+    margin-bottom: 30px;
+}
+
+
+.login-header h1 {
+    margin: 0 0 8px;
+}
+
+
+.login-header p {
+    margin: 0;
+
+    color: #666;
+}
+
+
+/* =========================
+   Role Selection
+========================= */
+
+.role-selection {
+    display: flex;
+
+    gap: 10px;
+
+    margin-bottom: 25px;
+}
+
+
+.role-button {
+    flex: 1;
+
+    padding: 12px;
+
+    border: 1px solid #ddd;
+
+    border-radius: 8px;
+
+    background: white;
+
+    cursor: pointer;
+
+    font-size: 15px;
+}
+
+
+.role-button.active {
+    background: #222;
+
+    color: white;
+
+    border-color: #222;
+}
+
+
+/* =========================
+   Form
+========================= */
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+
+.form-group label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-weight: 600;
+}
+
+
+.form-group input {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 12px;
+
+    border: 1px solid #ddd;
+
+    border-radius: 8px;
+
+    font-size: 15px;
+
+    outline: none;
+}
+
+
+.form-group input:focus {
+    border-color: #222;
+}
+
+
+/* =========================
+   Login Button
+========================= */
+
+.login-button {
+    width: 100%;
+
+    padding: 13px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #222;
+
+    color: white;
+
+    font-size: 16px;
+
+    cursor: pointer;
+}
+
+
+.login-button:hover {
+    opacity: 0.9;
+}
+
+
+/* =========================
+   Error
+========================= */
+
+.error-message {
+    min-height: 20px;
+
+    margin-top: 15px;
+
+    text-align: center;
+
+    color: #d32f2f;
+}
+
+
+/* =========================
+   Register
+========================= */
+
+.register-link {
+    text-align: center;
+
+    margin-top: 20px;
+}
+
+
+.register-link p {
+    color: #666;
+}
+
+
+.register-link a {
+    color: #222;
+
+    font-weight: 600;
+
+    text-decoration: none;
+}

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login - AI Civic Reporter</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <div class="login-card">
+
+            <div class="login-header">
+                <h1>AI Civic Reporter</h1>
+                <p>Login to your account</p>
+            </div>
+
+
+            <!-- Role Selection -->
+
+            <div class="role-selection">
+
+                <button
+                    type="button"
+                    id="citizenRole"
+                    class="role-button active"
+                    onclick="selectRole('CITIZEN')"
+                >
+                    Citizen
+                </button>
+
+                <button
+                    type="button"
+                    id="authorityRole"
+                    class="role-button"
+                    onclick="selectRole('AUTHORITY')"
+                >
+                    Authority
+                </button>
+
+            </div>
+
+
+            <!-- Login Form -->
+
+            <form id="loginForm">
+
+                <div class="form-group">
+
+                    <label for="email">
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        placeholder="Enter your email"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Enter your password"
+                        required
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="login-button"
+                >
+                    Login
+                </button>
+
+            </form>
+
+
+            <!-- Error -->
+
+            <p
+                id="errorMessage"
+                class="error-message"
+            ></p>
+
+
+            <!-- Register -->
+
+            <div class="register-link">
+
+                <p>
+                    Don't have an account?
+                    <a href="register.html">
+                        Register
+                    </a>
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script src="js/auth.js"></script>
+
+</body>
+</html>
