@@ -17,15 +17,18 @@ from .auth import (
     get_current_user,
     hash_password,
     verify_password,
+    require_authority,
+    require_citizen
 )
 from .database import get_db
-from .models import User,Issue
+from .models import User,Issue,IssueUpdate
 from .schemas import (
     Token,
     UserLogin,
     UserRegister,
     UserResponse,
-    IssueResponse
+    IssueResponse,
+    IssueStatusUpdate
 )
 
 
@@ -132,7 +135,7 @@ def get_me(
     return current_user
 
 # -------------------------
-# Issue Routes
+# Issue Router
 # -------------------------
 
 issue_router = APIRouter(
@@ -155,7 +158,9 @@ ALLOWED_CATEGORIES = {
     "ELECTRICAL_HAZARD",
     "OTHER",
 }
-
+# -------------------------
+# Issue Routes
+# -------------------------
 @issue_router.post(
     "",
     response_model=IssueResponse,
@@ -169,7 +174,7 @@ def create_issue(
     longitude: float | None = Form(None),
     image: UploadFile | None = File(None),
 
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_citizen),
     db: Session = Depends(get_db),
 ):
     category = category.upper()
@@ -215,7 +220,7 @@ def create_issue(
     response_model=list[IssueResponse],
 )
 def get_my_issues(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_citizen),
     db: Session = Depends(get_db),
 ):
     issues = (
@@ -233,7 +238,7 @@ def get_my_issues(
 )
 def get_issue(
     issue_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_citizen),
     db: Session = Depends(get_db),
 ):
     issue = (
@@ -250,5 +255,148 @@ def get_issue(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Issue not found",
         )
+
+    return issue
+
+# -------------------------
+# Authority Router
+# -------------------------
+
+authority_router = APIRouter(
+    prefix="/api/authority",
+    tags=["Authority"],
+)
+
+# -------------------------
+# Authority : Get All Issues
+# -------------------------
+
+@authority_router.get(
+    "/issues",
+    response_model=list[IssueResponse],
+)
+def get_all_issues(
+    current_user: User = Depends(require_authority),
+    db: Session = Depends(get_db),
+):
+    issues = (
+        db.query(Issue)
+        .order_by(Issue.created_at.desc())
+        .all()
+    )
+
+    return issues
+
+# -------------------------
+# Authority : Claim Issues
+# -------------------------
+
+@issue_router.patch(
+    "/{issue_id}/claim",
+    response_model=IssueResponse,
+)
+def claim_issue(
+    issue_id: int,
+    current_user: User = Depends(require_authority),
+    db: Session = Depends(get_db),
+):
+    issue = (
+        db.query(Issue)
+        .filter(Issue.id == issue_id)
+        .first()
+    )
+
+    if issue is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Issue not found",
+        )
+
+    if issue.assigned_to is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Issue is already assigned",
+        )
+
+    issue.assigned_to = current_user.id
+
+    db.commit()
+    db.refresh(issue)
+
+    return issue
+
+# -------------------------
+# Authority : Update Issue Status
+# -------------------------
+
+@issue_router.patch(
+    "/{issue_id}/status",
+    response_model=IssueResponse,
+)
+def update_issue_status(
+    issue_id: int,
+    update_data: IssueStatusUpdate,
+    current_user: User = Depends(require_authority),
+    db: Session = Depends(get_db),
+):
+    issue = (
+        db.query(Issue)
+        .filter(Issue.id == issue_id)
+        .first()
+    )
+
+    if issue is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Issue not found",
+        )
+
+    # Only the assigned authority can update the issue
+    if issue.assigned_to != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not assigned to this issue",
+        )
+
+    allowed_statuses = {
+        "PENDING",
+        "IN_PROGRESS",
+        "RESOLVED",
+    }
+
+    if update_data.status not in allowed_statuses:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid status",
+        )
+
+    current_status = issue.status
+    new_status = update_data.status
+
+    valid_transitions = {
+        "PENDING": ["IN_PROGRESS"],
+        "IN_PROGRESS": ["RESOLVED"],
+        "RESOLVED": [],
+    }
+
+    if new_status not in valid_transitions[current_status]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid status transition: {current_status} -> {new_status}",
+        )
+
+    issue.status = new_status
+
+    issue_update = IssueUpdate(
+        issue_id=issue.id,
+        updated_by=current_user.id,
+        old_status=current_status,
+        new_status=new_status,
+        comment=update_data.comment,
+    )
+
+    db.add(issue_update)
+    db.commit()
+    db.refresh(issue)
 
     return issue

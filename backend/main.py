@@ -3,13 +3,18 @@ from sqlalchemy import text
 from fastapi.middleware.cors import CORSMiddleware
 from .database import Base, engine
 from . import models
-from .routes import router as auth_router,issue_router
+from .routes import router as auth_router,issue_router,authority_router
 
 app = FastAPI(
     title="AI Civic Reporter",
     description="AI-powered platform for reporting and managing civic issues",
     version="0.1.0"
 )
+
+# -------------------------
+# CORS
+# -------------------------
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -19,9 +24,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ---------------
+# Static Uploads
+# ----------------
+
 @app.on_event("startup")
 def startup():
     Base.metadata.create_all(bind=engine)
+
+# -------------------------
+# Basic Routes
+# -------------------------
 
 @app.get("/")
 def root():
@@ -45,5 +58,10 @@ def database_health():
             "details": str(e)
         }
 
+# -------------------------
+# Routes
+# -------------------------
+
 app.include_router(auth_router)
 app.include_router(issue_router)
+app.include_router(authority_router)

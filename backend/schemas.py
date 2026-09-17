@@ -52,3 +52,10 @@ class IssueResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+# -------------------------
+# Issue Status Schemas
+# -------------------------
+class IssueStatusUpdate(BaseModel):
+    status: str
+    comment: str | None = None
