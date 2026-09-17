@@ -3,7 +3,7 @@ from sqlalchemy import text
 
 from .database import Base, engine
 from . import models
-from .routes import router as auth_router
+from .routes import router as auth_router,issue_router
 
 app = FastAPI(
     title="AI Civic Reporter",
@@ -38,3 +38,4 @@ def database_health():
         }
 
 app.include_router(auth_router)
+app.include_router(issue_router)
